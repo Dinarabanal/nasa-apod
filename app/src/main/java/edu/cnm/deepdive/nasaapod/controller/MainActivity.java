@@ -53,6 +53,13 @@ public class MainActivity extends AppCompatActivity {
     setDefaults(savedInstanceState);
 
   }
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putLong(CALENDAR_KEY, calendar.getTimeInMillis());
+    outState.putParcelable(APOD_KEY, apod);
+
+  }
 
   private void setupWebView() {
     webView = findViewById(R.id.web_view);
@@ -106,8 +113,17 @@ public class MainActivity extends AppCompatActivity {
   private void setDefaults(Bundle savedInstanceState) {
     calendar = Calendar.getInstance();
 
-    //TODO Check for savedInstanceState.
-    new ApodTask().execute();
+    if (savedInstanceState != null) {
+      calendar.setTimeInMillis(savedInstanceState.getLong(CALENDAR_KEY,
+          calendar.getTimeInMillis()));
+      apod = savedInstanceState.getParcelable(APOD_KEY);
+    }
+    if (apod != null){
+      progressSpinner.setVisibility(View.VISIBLE);
+      webView.loadUrl(apod.getUrl());
+    }else {
+      new ApodTask().execute();
+    }
   }
   private void pickDate() {
 
